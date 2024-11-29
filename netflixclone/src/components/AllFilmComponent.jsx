@@ -3,32 +3,43 @@ import React, { useState, useEffect } from 'react';
 import FilmCardComponent from './FilmCardComponent';
 import { Row } from 'react-bootstrap';
 
-// Componente principale che mostra una categoria di film
+/**
+ * Componente principale che mostra una categoria di film
+ * @param {string} category - La categoria dei film da visualizzare (es. "Action", "Comedy", ecc.)
+ * @param {string} title - Il titolo da mostrare sopra la lista dei film
+ * @param {string} contentType - Il tipo di contenuto da mostrare ("movie" o "series")
+ * @param {string} searchQuery - La query di ricerca inserita dall'utente
+ */
 const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
   // State per gestire l'array dei film e lo stato di caricamento
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Effect hook per recuperare i film quando la categoria cambia
+  // Effect hook che si attiva quando cambiano category, contentType o searchQuery
   useEffect(() => {
-    // Funzione asincrona per chiamare l'API OMDB
+    /**
+     * Funzione asincrona per recuperare i film dall'API OMDB
+     * Gestisce diverse logiche di ricerca in base alla categoria selezionata
+     */
     const fetchFilms = async () => {
       try {
         let searchResults = [];
-        const type = contentType || 'movie'; // Se contentType non è specificato, usa 'movie'
+        // Se contentType non è specificato, usa 'movie' come default
+        const type = contentType || 'movie';
         
+        // Logica per la ricerca per titolo o genere
         if (category === "search" && searchQuery) {
           setLoading(true);
           
-          // Cerca per titolo
+          // Prima cerca per titolo
           const titleResponse = await fetch(
             `http://www.omdbapi.com/?apikey=3cccd910&s=${searchQuery}&type=${type}`
           );
           const titleData = await titleResponse.json();
           let titleResults = [];
           
+          // Se trova risultati, ottiene i dettagli completi per ogni film
           if (titleData.Response === "True") {
-            // Ottieni dettagli completi per ogni risultato
             const detailedTitleResults = await Promise.all(
               titleData.Search.map(async (item) => {
                 const detailResponse = await fetch(
@@ -40,8 +51,8 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             titleResults = detailedTitleResults.filter(item => item.Response === "True");
           }
 
-          // Cerca per genere
-          const genrePages = [1, 2]; // Limita a 2 pagine per performance
+          // Poi cerca per genere (limitato a 2 pagine per performance)
+          const genrePages = [1, 2];
           let genreResults = [];
           
           for (const page of genrePages) {
@@ -51,6 +62,7 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             const data = await response.json();
             
             if (data.Response === "True") {
+              // Ottiene dettagli completi per ogni risultato
               const detailedResults = await Promise.all(
                 data.Search.map(async (item) => {
                   const detailResponse = await fetch(
@@ -60,7 +72,7 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
                 })
               );
               
-              // Filtra per genere che include la query di ricerca
+              // Filtra i risultati che hanno il genere cercato
               const genreMatches = detailedResults.filter(item => 
                 item.Response === "True" && 
                 item.Genre && 
@@ -71,7 +83,7 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             }
           }
 
-          // Combina e rimuovi duplicati
+          // Combina risultati e rimuove duplicati
           const allResults = [...titleResults, ...genreResults];
           searchResults = [...new Map(allResults.map(item => [item.imdbID, item])).values()];
 
@@ -85,15 +97,17 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1;
             if (!aTitle.startsWith(query) && bTitle.startsWith(query)) return 1;
             
-            // Poi per rating
+            // Poi ordina per rating
             return parseFloat(b.imdbRating || 0) - parseFloat(a.imdbRating || 0);
           });
 
           // Limita a 20 risultati per performance
           searchResults = searchResults.slice(0, 20);
-        } else if (['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category)) {
-          // Fetch di più pagine per ottenere più risultati
-          const pages = [1, 2, 3, 4]; // Fetch di 4 pagine
+        } 
+        // Logica per categorie specifiche (Action, Comedy, ecc.)
+        else if (['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category)) {
+          // Fetch di 4 pagine per avere più risultati
+          const pages = [1, 2, 3, 4];
           const allResults = [];
           
           for (const page of pages) {
@@ -107,7 +121,7 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             }
           }
           
-          // Ottieni i dettagli per tutti i risultati
+          // Ottiene dettagli completi e filtra per genere
           const detailedResults = await Promise.all(
             allResults.map(async (item) => {
               const detailResponse = await fetch(
@@ -117,16 +131,19 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             })
           );
           
-          // Filtra per genere e rimuovi eventuali duplicati
+          // Filtra per genere e rimuove duplicati
           searchResults = detailedResults
             .filter(item => item.Genre && item.Genre.includes(category))
             .filter((item, index, self) => 
               index === self.findIndex((t) => t.imdbID === item.imdbID)
             );
-        } else if (category === "new-releases") {
+        }
+        // Logica per nuove uscite
+        else if (category === "new-releases") {
           const years = ["2024", "2023", "2022"];
           const allResults = [];
           
+          // Cerca film degli ultimi 3 anni
           for (const year of years) {
             const response = await fetch(
               `http://www.omdbapi.com/?apikey=3cccd910&s=${type}&y=${year}&type=${type}`
@@ -140,18 +157,20 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
             }
           }
           
+          // Ordina per anno e prende i primi 10
           searchResults = allResults
             .sort((a, b) => b.Year - a.Year)
             .slice(0, 10);
-        } else if (category === "top-10") {
-          // Fetch per film/serie con rating alto
+        }
+        // Logica per top 10
+        else if (category === "top-10") {
           const response = await fetch(
             `http://www.omdbapi.com/?apikey=3cccd910&s=movie&type=${type}`
           );
           const data = await response.json();
           
           if (data.Response === "True") {
-            // Ottieni i dettagli per i primi 20 risultati (per avere abbastanza film con rating alto)
+            // Ottiene dettagli per i primi 20 risultati
             const detailedResults = await Promise.all(
               data.Search.slice(0, 20).map(async (item) => {
                 const detailResponse = await fetch(
@@ -161,7 +180,7 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
               })
             );
             
-            // Filtra per rating > 8 e prendi i primi 10
+            // Filtra per rating > 8 e prende i top 10
             searchResults = detailedResults
               .filter(movie => {
                 const rating = parseFloat(movie.imdbRating);
@@ -170,7 +189,9 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
               .sort((a, b) => parseFloat(b.imdbRating) - parseFloat(a.imdbRating))
               .slice(0, 10);
           }
-        } else {
+        }
+        // Logica default per altre categorie
+        else {
           const response = await fetch(
             `http://www.omdbapi.com/?apikey=3cccd910&s=${category}&type=${type}`
           );
@@ -188,25 +209,26 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
       }
     };
 
-    // Debounce per la ricerca
+    // Implementa un debounce di 300ms per la ricerca
     const timeoutId = setTimeout(() => {
       fetchFilms();
     }, 300);
 
+    // Cleanup function per cancellare il timeout
     return () => clearTimeout(timeoutId);
   }, [category, contentType, searchQuery]);
 
-  // Mostra un messaggio di caricamento mentre i dati vengono recuperati
+  // Mostra loader durante il caricamento
   if (loading) return <div className="text-white">Caricamento...</div>;
 
-  // Rendering del componente
+  // Rendering del componente con la lista dei film
   return (
     <div className="film-category">
       <h2 className="section-title text-white text-start mb-4">{title}</h2>
       <div className="film-row">
         <Row className={`${['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category) 
-          ? '' 
-          : 'flex-nowrap overflow-auto'}`}
+          ? '' // Layout normale per categorie specifiche
+          : 'flex-nowrap overflow-auto'}`} // Layout scrollabile per altre categorie
         >
           {films.map((film) => (
             <div key={film.imdbID}>

@@ -1,20 +1,24 @@
+/* Stile principale dell'applicazione */
 .App {
   text-align: center;
   min-height: 100vh;
   background-color: black;
 }
 
+/* Stile del logo dell'applicazione */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
+/* Animazione del logo solo se l'utente non ha preferenze di riduzione del movimento */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+/* Stile dell'header dell'applicazione */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -26,10 +30,12 @@
   color: white;
 }
 
+/* Stile dei link nell'applicazione */
 .App-link {
   color: #61dafb;
 }
 
+/* Definizione dell'animazione di rotazione del logo */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -39,17 +45,18 @@
   }
 }
 
-/* Navbar styles */
+/* Stili della navbar */
 .navbar {
   background-color: transparent;
   transition: background-color 0.3s ease;
 }
 
+/* Stile della navbar quando si scrolla */
 .navbar.scrolled {
   background-color: #000;
 }
 
-/* Footer styles */
+/* Stili del footer */
 footer {
   font-size: 0.9rem;
 }
@@ -58,11 +65,12 @@ footer ul li {
   margin-bottom: 0.5rem;
 }
 
+/* Effetto hover sui link del footer */
 footer a:hover {
   text-decoration: underline !important;
 }
 
-/* Responsive adjustments */
+/* Adattamenti responsive per il footer */
 @media (max-width: 768px) {
   footer {
     text-align: center;
@@ -73,6 +81,7 @@ footer a:hover {
   }
 }
 
+/* Stili per le sezioni dei film */
 .film-sections .film-category {
   margin-bottom: 3rem;
 }
@@ -81,20 +90,16 @@ footer a:hover {
   margin-bottom: 0;
 }
 
-/* Stile per il layout dei generi */
+/* Layout per la griglia dei generi */
 .film-category .row:not(.flex-nowrap) {
   margin-right: 0;
   margin-left: 0;
   justify-content: flex-start;
 }
 
-/* Assicura che le card abbiano altezza uniforme */
+/* Stile base per le card dei film */
 .film-card {
   height: 100%;
-}
-
-/* Stili per le card dei film */
-.film-card {
   transition: transform 0.2s ease-in-out;
   border: none;
   border-radius: 8px;
@@ -102,30 +107,35 @@ footer a:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Effetto hover sulle card dei film */
 .film-card:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Container per i poster dei film */
 .film-poster-container {
-  height: 300px; /* Altezza fissa per il contenitore del poster */
+  height: 300px;
   overflow: hidden;
   position: relative;
 }
 
+/* Stile delle immagini dei poster */
 .film-poster {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Mantiene le proporzioni dell'immagine */
+  object-fit: cover;
   object-position: center;
 }
 
+/* Stile del corpo delle card dei film */
 .film-card .card-body {
   padding: 1rem;
   background-color: #000;
-  height: 100px; /* Altezza fissa per il body della card */
+  height: 100px;
 }
 
+/* Stili per il titolo e il testo nelle card */
 .film-card .card-title {
   font-size: 1rem;
   margin-bottom: 0.5rem;
@@ -136,7 +146,7 @@ footer a:hover {
   font-size: 0.9rem;
 }
 
-/* Modifica il layout delle righe per i generi */
+/* Layout per le righe dei generi */
 .film-category .row:not(.flex-nowrap) {
   display: flex;
   flex-wrap: wrap;
@@ -164,6 +174,7 @@ footer a:hover {
   padding: 0;
 }
 
+/* Stili per il modal dei film */
 .film-modal .modal-content {
   background-color: #000;
   color: #fff;
@@ -180,6 +191,7 @@ footer a:hover {
   padding: 2rem;
 }
 
+/* Effetti hover per le immagini nel modal */
 .film-modal .img-fluid {
   transition: transform 0.3s ease-in-out;
 }
@@ -188,6 +200,7 @@ footer a:hover {
   transform: scale(1.05);
 }
 
+/* Stili per i testi nel modal */
 .film-modal .text-white {
   color: #fff;
 }
@@ -196,11 +209,13 @@ footer a:hover {
   color: #b0b0b0;
 }
 
+/* Stile per i badge nel modal */
 .film-modal .badge {
   background-color: #dc3545;
   color: #fff;
 }
 
+/* Animazione di fade-in */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -212,6 +227,7 @@ footer a:hover {
   }
 }
 
+/* Container per il titolo dinamico */
 .dynamic-title-container {
   position: relative;
   width: 100%;
@@ -220,6 +236,7 @@ footer a:hover {
   margin-bottom: 2rem;
 }
 
+/* Stile del titolo principale */
 .main-title {
   position: relative;
   color: white;
@@ -231,6 +248,7 @@ footer a:hover {
   padding: 0 1rem;
 }
 
+/* Sfondo animato per il titolo */
 .title-background {
   position: absolute;
   top: 0;
@@ -250,7 +268,7 @@ footer a:hover {
   z-index: 1;
 }
 
-/* Effetto vignetta sui bordi */
+/* Effetto vignetta sui bordi del titolo */
 .title-background::after {
   content: '';
   position: absolute;
@@ -265,6 +283,7 @@ footer a:hover {
   );
 }
 
+/* Animazione del gradiente */
 @keyframes gradientAnimation {
   0% {
     background-position: 0% 50%;
@@ -288,7 +307,7 @@ footer a:hover {
   }
 }
 
-/* Effetto hover sul titolo */
+/* Effetti hover sul container del titolo */
 .dynamic-title-container:hover .title-background {
   animation: gradientAnimation 8s ease infinite;
 }
@@ -298,7 +317,7 @@ footer a:hover {
   transition: transform 0.3s ease;
 }
 
-/* Stile per il layout dei generi in versione mobile */
+/* Layout responsive per i generi su mobile */
 @media (max-width: 768px) {
   .genre-grid .film-row .row {
     display: grid;
@@ -327,6 +346,7 @@ footer a:hover {
   }
 }
 
+/* Stili per il loader */
 .loader-container {
   position: fixed;
   top: 0;
@@ -340,6 +360,7 @@ footer a:hover {
   z-index: 9999;
 }
 
+/* Stili per il container degli errori */
 .error-container {
   display: flex;
   flex-direction: column;
@@ -349,12 +370,14 @@ footer a:hover {
   padding: 2rem;
 }
 
+/* Stile per il logo Netflix in caso di errore */
 .netflix-logo-error {
   width: 200px;
   height: auto;
   animation: pulse 2s infinite;
 }
 
+/* Stili per i messaggi di errore */
 .error-message {
   color: white;
 }
@@ -369,6 +392,7 @@ footer a:hover {
   color: #e50914;
 }
 
+/* Animazione pulse per il logo in caso di errore */
 @keyframes pulse {
   0% {
     opacity: 1;
@@ -381,6 +405,7 @@ footer a:hover {
   }
 }
 
+/* Wrapper per le card dei film */
 .film-card-wrapper {
   flex: 0 0 auto;
   width: 250px;
@@ -388,7 +413,7 @@ footer a:hover {
   padding: 0.5rem;
 }
 
-/* Stile per il contenitore del loader delle card */
+/* Stile per il loader delle card */
 .film-card-wrapper.loading {
   background-color: #141414;
   border-radius: 4px;
@@ -397,7 +422,7 @@ footer a:hover {
   align-items: center;
 }
 
-/* Stile per il loader iniziale */
+/* Container per il loader principale */
 .loader-container {
   position: fixed;
   top: 0;
@@ -411,6 +436,7 @@ footer a:hover {
   z-index: 9999;
 }
 
+/* Stile per le card in fase di caricamento */
 .film-card-loading {
   width: 250px;
   height: 400px;
@@ -422,6 +448,7 @@ footer a:hover {
   margin: auto;
 }
 
+/* Wrapper per le card dei film */
 .film-card-wrapper {
   flex: 0 0 auto;
   padding: 0.5rem;
@@ -439,27 +466,18 @@ footer a:hover {
   align-items: center;
 }
 
-/* Animazione di fade-in per le card quando caricate */
+/* Animazione di fade-in per le card */
 .film-card {
   animation: fadeIn 0.3s ease-in;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Container per la barra di ricerca */
 .search-container {
   position: relative;
   margin-right: 1rem;
 }
 
+/* Stile per l'input di ricerca */
 .search-input {
   background-color: transparent !important;
   border: none !important;
@@ -471,17 +489,20 @@ footer a:hover {
   animation: expandWidth 0.3s ease forwards;
 }
 
+/* Focus sull'input di ricerca */
 .search-input:focus {
   box-shadow: none !important;
   border-color: #e50914 !important;
 }
 
+/* Container per l'icona di ricerca */
 .search-icon-container {
   cursor: pointer;
   padding: 0.5rem;
   color: white;
 }
 
+/* Animazione di espansione della barra di ricerca */
 @keyframes expandWidth {
   from {
     width: 0;
@@ -491,6 +512,7 @@ footer a:hover {
   }
 }
 
+/* Animazione per i risultati della ricerca */
 .search-results {
   opacity: 0;
   transform: translateY(-10px);
@@ -504,6 +526,7 @@ footer a:hover {
   }
 }
 
+/* Effetti hover per le card dei film */
 .film-card {
   transition: transform 0.3s ease;
 }
@@ -513,6 +536,7 @@ footer a:hover {
   z-index: 1;
 }
 
+/* Pulsante di salvataggio */
 .save-button {
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -523,18 +547,21 @@ footer a:hover {
   opacity: 1;
 }
 
+/* Stili per la sezione profilo */
 .profile-section {
   background-color: #141414;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Sezione dei film salvati */
 .saved-films-section {
   padding: 1rem;
   background-color: #141414;
   border-radius: 8px;
 }
 
+/* Carosello dei film */
 .film-carousel {
   margin: 0 -0.5rem;
   padding-bottom: 1rem;
@@ -544,6 +571,7 @@ footer a:hover {
   padding: 0 0.5rem;
 }
 
+/* Effetti hover per la navbar */
 .navbar .nav-link img {
   transition: transform 0.2s ease;
 }
@@ -553,11 +581,13 @@ footer a:hover {
   cursor: pointer;
 }
 
+/* Container per i poster dei film */
 .film-poster-container {
   position: relative;
   overflow: hidden;
 }
 
+/* Overlay per le card dei film */
 .film-card-overlay {
   position: absolute;
   top: 0;
@@ -576,6 +606,7 @@ footer a:hover {
   opacity: 1;
 }
 
+/* Pulsante di salvataggio */
 .save-button {
   transform: scale(0.8);
   transition: transform 0.2s ease;
@@ -585,6 +616,7 @@ footer a:hover {
   transform: scale(1);
 }
 
+/* Effetti per le card dei film */
 .film-card {
   transition: all 0.3s ease;
 }
@@ -594,11 +626,12 @@ footer a:hover {
   box-shadow: 0 8px 16px rgba(0,0,0,0.3);
 }
 
-/* Animazione per l'aggiunta/rimozione delle card */
+/* Animazioni per il carosello */
 .film-carousel .col-auto {
   transition: all 0.3s ease;
 }
 
+/* Stili per la modalità bambini */
 .kids-mode-link {
   transition: all 0.3s ease;
   position: relative;
@@ -620,6 +653,7 @@ footer a:hover {
   animation: slideIn 0.3s ease;
 }
 
+/* Animazione per la modalità bambini */
 @keyframes slideIn {
   from {
     transform: scaleX(0);
@@ -629,6 +663,7 @@ footer a:hover {
   }
 }
 
+/* Stili per il modal della modalità bambini */
 .kids-modal .modal-content {
   border: 2px solid #ffd700;
   border-radius: 15px;
@@ -649,6 +684,7 @@ footer a:hover {
   animation: spin 2s infinite linear;
 }
 
+/* Animazioni per la modalità bambini */
 @keyframes fadeIn {
   from {
     opacity: 0;

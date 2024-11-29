@@ -4,7 +4,16 @@ import { Navbar, Nav, Container, Form } from 'react-bootstrap';
 // Importazione delle icone dalla libreria react-icons
 import { BsBell, BsSearch, BsX } from 'react-icons/bs';
 
-// Componente della barra di navigazione principale
+/**
+ * Componente della barra di navigazione principale
+ * @param {function} onHomeClick - Funzione per gestire il click sulla home
+ * @param {function} onTVSeriesClick - Funzione per gestire il click sulle serie TV
+ * @param {function} onMoviesClick - Funzione per gestire il click sui film
+ * @param {function} onSearch - Funzione per gestire la ricerca
+ * @param {function} onProfileClick - Funzione per gestire il click sul profilo
+ * @param {function} onKidsClick - Funzione per gestire il click sulla modalità bambini
+ * @param {boolean} isKidsMode - Flag che indica se la modalità bambini è attiva
+ */
 const NavbarComponent = ({ 
   onHomeClick, 
   onTVSeriesClick, 
@@ -14,9 +23,14 @@ const NavbarComponent = ({
   onKidsClick,
   isKidsMode 
 }) => {
+  // Stati locali per gestire la visibilità e il valore della barra di ricerca
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  /**
+   * Gestisce il click sull'icona di ricerca
+   * Mostra/nasconde la barra di ricerca e resetta la query quando viene chiusa
+   */
   const handleSearchClick = () => {
     setShowSearch(!showSearch);
     if (showSearch) {
@@ -25,6 +39,10 @@ const NavbarComponent = ({
     }
   };
 
+  /**
+   * Gestisce il cambiamento del testo nella barra di ricerca
+   * @param {Event} e - Evento del form
+   */
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
@@ -61,7 +79,9 @@ const NavbarComponent = ({
 
           {/* Menu destro con ricerca, sezione bambini, notifiche e profilo */}
           <Nav className="d-flex align-items-center">
+            {/* Contenitore della barra di ricerca con icona */}
             <div className="search-container d-flex align-items-center">
+              {/* Input di ricerca mostrato solo quando showSearch è true */}
               {showSearch && (
                 <Form.Control
                   type="text"
@@ -72,6 +92,7 @@ const NavbarComponent = ({
                   autoFocus
                 />
               )}
+              {/* Icona di ricerca/chiusura */}
               <div 
                 className="search-icon-container" 
                 onClick={handleSearchClick}
@@ -79,6 +100,7 @@ const NavbarComponent = ({
                 {showSearch ? <BsX size={20} /> : <BsSearch size={20} />}
               </div>
             </div>
+            {/* Link per la modalità bambini con stile condizionale */}
             <Nav.Link 
               onClick={onKidsClick}
               className={`kids-mode-link ${isKidsMode ? 'active' : ''}`}

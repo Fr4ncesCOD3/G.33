@@ -2,38 +2,54 @@
 import React, { useState } from 'react';
 import { Card, Button } from 'react-bootstrap'; 
 import FilmPageComponent from './FilmPageComponent';
-import { BsPlus, BsCheck2, BsX } from 'react-icons/bs'; // Importa le icone
-import { motion, AnimatePresence } from 'framer-motion'; // Importa framer-motion
+import { BsPlus, BsCheck2, BsX } from 'react-icons/bs'; // Importa le icone per i pulsanti di salvataggio
+import { motion } from 'framer-motion'; // Importa framer-motion per le animazioni
 
-// Componente che rappresenta una card per un singolo film
+/**
+ * Componente che rappresenta una card per un singolo film
+ * @param {Object} film - Oggetto contenente i dati del film
+ * @param {Function} onRemove - Funzione callback per rimuovere il film dalla lista dei salvati
+ */
 const FilmCardComponent = ({ film, onRemove }) => {
   // State per gestire la visualizzazione del modal con i dettagli del film
   const [showModal, setShowModal] = useState(false);
+  
+  // State per gestire lo stato di salvataggio del film, inizializzato controllando il localStorage
   const [isSaved, setIsSaved] = useState(() => {
     const savedFilms = JSON.parse(localStorage.getItem('savedFilms')) || [];
     return savedFilms.some(savedFilm => savedFilm.imdbID === film.imdbID);
   });
+  
+  // State per gestire l'hover sulla card
   const [isHovered, setIsHovered] = useState(false);
 
-  // Handler per il click sulla card che mostra il modal
+  /**
+   * Handler per aprire il modal con i dettagli del film
+   */
   const handleClick = () => {
     setShowModal(true);
   };
 
+  /**
+   * Handler per gestire il salvataggio/rimozione del film
+   * @param {Event} e - Evento del click
+   */
   const handleSaveFilm = (e) => {
-    e.stopPropagation(); // Previene l'apertura del modal
+    e.stopPropagation(); // Previene l'apertura del modal quando si clicca sul pulsante di salvataggio
     const savedFilms = JSON.parse(localStorage.getItem('savedFilms')) || [];
     
     if (isSaved) {
+      // Rimuove il film dalla lista dei salvati
       const updatedFilms = savedFilms.filter(savedFilm => savedFilm.imdbID !== film.imdbID);
       localStorage.setItem('savedFilms', JSON.stringify(updatedFilms));
       setIsSaved(false);
       
-      // Se siamo nella pagina profilo, chiamiamo onRemove
+      // Se siamo nella pagina profilo, chiamiamo onRemove per aggiornare l'UI
       if (onRemove) {
         onRemove(film.imdbID);
       }
     } else {
+      // Aggiunge il film alla lista dei salvati
       savedFilms.push(film);
       localStorage.setItem('savedFilms', JSON.stringify(savedFilms));
       setIsSaved(true);
@@ -41,6 +57,7 @@ const FilmCardComponent = ({ film, onRemove }) => {
   };
 
   return (
+    // Wrapper con animazioni per la card
     <motion.div
       layout
       initial={{ opacity: 0, scale: 0.8 }}
@@ -56,11 +73,12 @@ const FilmCardComponent = ({ film, onRemove }) => {
         className="film-card bg-black text-white-50" 
         style={{ 
           cursor: 'pointer',
-          width: '250px',  // Larghezza fissa
-          height: '400px', // Altezza fissa
+          width: '250px',  // Larghezza fissa per uniformità
+          height: '400px', // Altezza fissa per uniformità
           margin: 'auto'
         }}
       >
+        {/* Container per il poster con overlay al hover */}
         <div className="film-poster-container">
           <Card.Img 
             variant="top" 
@@ -68,9 +86,11 @@ const FilmCardComponent = ({ film, onRemove }) => {
             alt={film.Title}
             className="film-poster"
             onError={(e) => {
+              // Fallback image se il poster non è disponibile
               e.target.src = 'https://via.placeholder.com/300x450?text=No+Poster';
             }}
           />
+          {/* Overlay animato che appare al hover con il pulsante di salvataggio */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
@@ -82,6 +102,7 @@ const FilmCardComponent = ({ film, onRemove }) => {
               className="save-button"
               onClick={handleSaveFilm}
             >
+              {/* Mostra icona appropriata in base allo stato di salvataggio */}
               {isSaved ? (
                 onRemove ? <BsX size={20} /> : <BsCheck2 size={20} />
               ) : (
@@ -90,6 +111,7 @@ const FilmCardComponent = ({ film, onRemove }) => {
             </Button>
           </motion.div>
         </div>
+        {/* Body della card con titolo e anno */}
         <Card.Body className="d-flex flex-column justify-content-between">
           <div>
             <Card.Title className="text-truncate text-white">{film.Title}</Card.Title>
@@ -98,7 +120,7 @@ const FilmCardComponent = ({ film, onRemove }) => {
         </Card.Body>
       </Card>
 
-      {/* Componente modal che mostra i dettagli completi del film */}
+      {/* Modal con i dettagli completi del film */}
       <FilmPageComponent 
         show={showModal}
         onHide={() => setShowModal(false)}
