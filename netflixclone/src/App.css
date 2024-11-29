@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  min-height: 100vh;
+  background-color: black;
 }
 
 .App-logo {
@@ -68,5 +70,601 @@ footer a:hover {
   
   footer .col {
     margin-bottom: 2rem;
+  }
+}
+
+.film-sections .film-category {
+  margin-bottom: 3rem;
+}
+
+.film-sections .film-category:last-child {
+  margin-bottom: 0;
+}
+
+/* Stile per il layout dei generi */
+.film-category .row:not(.flex-nowrap) {
+  margin-right: 0;
+  margin-left: 0;
+  justify-content: flex-start;
+}
+
+/* Assicura che le card abbiano altezza uniforme */
+.film-card {
+  height: 100%;
+}
+
+/* Stili per le card dei film */
+.film-card {
+  transition: transform 0.2s ease-in-out;
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.film-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.film-poster-container {
+  height: 300px; /* Altezza fissa per il contenitore del poster */
+  overflow: hidden;
+  position: relative;
+}
+
+.film-poster {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Mantiene le proporzioni dell'immagine */
+  object-position: center;
+}
+
+.film-card .card-body {
+  padding: 1rem;
+  background-color: #000;
+  height: 100px; /* Altezza fissa per il body della card */
+}
+
+.film-card .card-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.film-card .card-text {
+  font-size: 0.9rem;
+}
+
+/* Modifica il layout delle righe per i generi */
+.film-category .row:not(.flex-nowrap) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.film-category .row:not(.flex-nowrap) > div {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  padding: 0;
+}
+
+/* Stile per il carosello scrollabile */
+.film-category .row.flex-nowrap {
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+.film-category .row.flex-nowrap > div {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: none;
+  padding: 0;
+}
+
+.film-modal .modal-content {
+  background-color: #000;
+  color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.film-modal .modal-header {
+  border-bottom: none;
+}
+
+.film-modal .modal-body {
+  padding: 2rem;
+}
+
+.film-modal .img-fluid {
+  transition: transform 0.3s ease-in-out;
+}
+
+.film-modal .img-fluid:hover {
+  transform: scale(1.05);
+}
+
+.film-modal .text-white {
+  color: #fff;
+}
+
+.film-modal .text-muted {
+  color: #b0b0b0;
+}
+
+.film-modal .badge {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dynamic-title-container {
+  position: relative;
+  width: 100%;
+  padding: 2rem 0;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  position: relative;
+  color: white;
+  font-size: 3rem;
+  font-weight: 700;
+  text-align: left;
+  z-index: 2;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+.title-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    #000000,
+    #1a1a1a,
+    #2b2b2b,
+    #1a1a1a,
+    #000000
+  );
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  z-index: 1;
+}
+
+/* Effetto vignetta sui bordi */
+.title-background::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Media query per schermi più piccoli */
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 2rem;
+  }
+  
+  .dynamic-title-container {
+    padding: 1.5rem 0;
+  }
+}
+
+/* Effetto hover sul titolo */
+.dynamic-title-container:hover .title-background {
+  animation: gradientAnimation 8s ease infinite;
+}
+
+.dynamic-title-container:hover .main-title {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+/* Stile per il layout dei generi in versione mobile */
+@media (max-width: 768px) {
+  .genre-grid .film-row .row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .genre-grid .film-card {
+    width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+  }
+
+  .genre-grid .film-card img {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .genre-grid .card-body {
+    padding: 0.5rem;
+  }
+
+  .genre-grid .card-title {
+    font-size: 0.9rem;
+  }
+}
+
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.netflix-logo-error {
+  width: 200px;
+  height: auto;
+  animation: pulse 2s infinite;
+}
+
+.error-message {
+  color: white;
+}
+
+.error-message h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-message p {
+  font-size: 1rem;
+  color: #e50914;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.film-card-wrapper {
+  flex: 0 0 auto;
+  width: 250px;
+  height: 350px;
+  padding: 0.5rem;
+}
+
+/* Stile per il contenitore del loader delle card */
+.film-card-wrapper.loading {
+  background-color: #141414;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Stile per il loader iniziale */
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.film-card-loading {
+  width: 250px;
+  height: 400px;
+  background-color: #141414;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.film-card-wrapper {
+  flex: 0 0 auto;
+  padding: 0.5rem;
+}
+
+/* Stili per il loader nel modal */
+.film-modal .modal-content {
+  background-color: transparent;
+}
+
+.film-modal .modal-body {
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Animazione di fade-in per le card quando caricate */
+.film-card {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-container {
+  position: relative;
+  margin-right: 1rem;
+}
+
+.search-input {
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #fff !important;
+  border-radius: 0 !important;
+  color: white !important;
+  padding: 0.5rem 0;
+  width: 0;
+  animation: expandWidth 0.3s ease forwards;
+}
+
+.search-input:focus {
+  box-shadow: none !important;
+  border-color: #e50914 !important;
+}
+
+.search-icon-container {
+  cursor: pointer;
+  padding: 0.5rem;
+  color: white;
+}
+
+@keyframes expandWidth {
+  from {
+    width: 0;
+  }
+  to {
+    width: 250px;
+  }
+}
+
+.search-results {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInResults 0.3s ease forwards;
+}
+
+@keyframes fadeInResults {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.film-card {
+  transition: transform 0.3s ease;
+}
+
+.film-card:hover {
+  transform: scale(1.05);
+  z-index: 1;
+}
+
+.save-button {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.film-card:hover .save-button {
+  opacity: 1;
+}
+
+.profile-section {
+  background-color: #141414;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.saved-films-section {
+  padding: 1rem;
+  background-color: #141414;
+  border-radius: 8px;
+}
+
+.film-carousel {
+  margin: 0 -0.5rem;
+  padding-bottom: 1rem;
+}
+
+.film-carousel .col-auto {
+  padding: 0 0.5rem;
+}
+
+.navbar .nav-link img {
+  transition: transform 0.2s ease;
+}
+
+.navbar .nav-link:hover img {
+  transform: scale(1.1);
+  cursor: pointer;
+}
+
+.film-poster-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.film-card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.film-card:hover .film-card-overlay {
+  opacity: 1;
+}
+
+.save-button {
+  transform: scale(0.8);
+  transition: transform 0.2s ease;
+}
+
+.save-button:hover {
+  transform: scale(1);
+}
+
+.film-card {
+  transition: all 0.3s ease;
+}
+
+.film-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+/* Animazione per l'aggiunta/rimozione delle card */
+.film-carousel .col-auto {
+  transition: all 0.3s ease;
+}
+
+.kids-mode-link {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.kids-mode-link.active {
+  color: #ffd700 !important;
+  font-weight: bold;
+}
+
+.kids-mode-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ffd700;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.kids-modal .modal-content {
+  border: 2px solid #ffd700;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.kids-modal ul li {
+  padding: 8px 0;
+  position: relative;
+  padding-left: 25px;
+  animation: fadeIn 0.5s ease;
+}
+
+.kids-modal ul li:before {
+  content: "🌟";
+  position: absolute;
+  left: 0;
+  animation: spin 2s infinite linear;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

@@ -1,30 +1,85 @@
 // Importazione delle dipendenze necessarie
 import React from 'react';
 import AllFilmComponent from './AllFilmComponent'; // Componente per visualizzare le sezioni di film
-import { Container } from 'react-bootstrap'; // Container di Bootstrap per il layout
+import { Container, Dropdown } from 'react-bootstrap'; // Aggiunto Dropdown di Bootstrap
 
 // Componente principale che rappresenta la pagina principale dell'applicazione
-const MainPage = () => {
-  return (
-    // Container fluido con padding orizzontale
-    <Container fluid className="px-4">
-      {/* Titolo principale della pagina */}
-      <h1 className="main-title mb-4">TV Shows</h1>
+const MainPage = ({ selectedGenre, setSelectedGenre, contentType, searchQuery, isKidsMode }) => {
+  const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'];
 
-      {/* Menu a tendina per i generi (da implementare la funzionalità) */}
-      <div className="genres-dropdown mb-4">
-        <button className="btn btn-outline-light">Genres <span className="caret"></span></button>
+  return (
+    <>
+      <div className="dynamic-title-container">
+        <h1 className="main-title text-center">
+          {searchQuery ? `Risultati per: ${searchQuery}` :
+           isKidsMode ? '🌟 Area Bambini' :
+           contentType === 'series' ? 'Serie TV' : 
+           contentType === 'movie' ? 'Film' : 
+           'TV Shows & Movies'}
+        </h1>
+        <div className="title-background"></div>
       </div>
-      
-      {/* Sezioni di film organizzate per categoria */}
-      {/* Ogni AllFilmComponent riceve una categoria e un titolo da visualizzare */}
-      <AllFilmComponent category="Trending" title="Trending Now" />
-      <AllFilmComponent category="Popular" title="Watch It Again" />
-      <AllFilmComponent category="New" title="New Releases" />
-      <AllFilmComponent category="Comedy" title="Comedy Shows" />
-      <AllFilmComponent category="Drama" title="Drama Series" />
-      <AllFilmComponent category="Action" title="Action & Adventure" />
-    </Container>
+
+      <Container fluid className="px-4">
+        {searchQuery ? (
+          <AllFilmComponent 
+            category="search"
+            title="Risultati della ricerca"
+            contentType={contentType}
+            searchQuery={searchQuery}
+            isKidsMode={isKidsMode}
+          />
+        ) : (
+          <>
+            {!isKidsMode && (
+              <Dropdown className="genres-dropdown mb-4">
+                <Dropdown.Toggle variant="outline-light" id="dropdown-basic">
+                  Genres
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                  {genres.map((genre) => (
+                    <Dropdown.Item key={genre} onClick={() => setSelectedGenre(genre)}>
+                      {genre}
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            )}
+
+            {selectedGenre && !isKidsMode ? (
+              <AllFilmComponent 
+                category={selectedGenre} 
+                title={`Genre: ${selectedGenre}`} 
+                contentType={contentType}
+                isKidsMode={isKidsMode}
+              />
+            ) : (
+              <div className="film-sections">
+                <AllFilmComponent 
+                  category="animation"
+                  title={isKidsMode ? "Cartoni Animati" : "Nuove Uscite"}
+                  contentType={contentType}
+                  isKidsMode={isKidsMode}
+                />
+                <AllFilmComponent 
+                  category="disney"
+                  title={isKidsMode ? "Disney" : "Top 10 Questo Mese"}
+                  contentType={contentType}
+                  isKidsMode={isKidsMode}
+                />
+                <AllFilmComponent 
+                  category="pixar"
+                  title={isKidsMode ? "Pixar" : "In Arrivo"}
+                  contentType={contentType}
+                  isKidsMode={isKidsMode}
+                />
+              </div>
+            )}
+          </>
+        )}
+      </Container>
+    </>
   );
 };
 

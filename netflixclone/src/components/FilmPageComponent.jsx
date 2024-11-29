@@ -4,15 +4,12 @@ import { Modal, Row, Col, Badge } from 'react-bootstrap';
 
 // Componente che mostra i dettagli di un film in un modal
 const FilmPageComponent = ({ show, onHide, filmId }) => {
-  // State per memorizzare i dettagli del film e lo stato di caricamento
   const [filmDetails, setFilmDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Effect hook per recuperare i dettagli del film quando il modal viene aperto
   useEffect(() => {
     const fetchFilmDetails = async () => {
       try {
-        // Chiamata API a OMDB per ottenere i dettagli del film
         const response = await fetch(
           `http://www.omdbapi.com/?apikey=3cccd910&i=${filmId}&plot=full`
         );
@@ -27,51 +24,50 @@ const FilmPageComponent = ({ show, onHide, filmId }) => {
       }
     };
 
-    // Esegui la chiamata API solo quando il modal è visibile
     if (show) {
       fetchFilmDetails();
     }
   }, [show, filmId]);
 
-  // Gestione dei diversi stati del componente
-  if (!show) return null; // Non renderizzare nulla se il modal è nascosto
-  if (loading) return <Modal show={show} onHide={onHide}><Modal.Body>Caricamento...</Modal.Body></Modal>;
+  if (!show) return null;
+  if (loading) {
+    return (
+      <Modal show={show} onHide={onHide} size="lg" centered className="film-modal">
+        <Modal.Body className="d-flex justify-content-center align-items-center bg-black" style={{ minHeight: '300px' }}>
+          <l-mirage size="40" speed="2.5" color="red"></l-mirage>
+        </Modal.Body>
+      </Modal>
+    );
+  }
   if (!filmDetails) return null;
 
-  // Rendering del modal con i dettagli del film
   return (
-    <Modal show={show} onHide={onHide} size="lg" centered>
-      {/* Header del modal con titolo del film e anno */}
-      <Modal.Header closeButton>
-        <Modal.Title>{filmDetails.Title} ({filmDetails.Year})</Modal.Title>
+    <Modal show={show} onHide={onHide} size="lg" centered className="film-modal">
+      <Modal.Header closeButton className="border-0">
+        <Modal.Title className="text-white">{filmDetails.Title} ({filmDetails.Year})</Modal.Title>
       </Modal.Header>
-      <Modal.Body className="p-4">
+      <Modal.Body className="p-4 bg-black text-white">
         <Row>
-          {/* Colonna sinistra con il poster del film */}
-          <Col md={4}>
+          <Col md={4} className="mb-3">
             <img 
               src={filmDetails.Poster} 
               alt={filmDetails.Title} 
-              className="img-fluid rounded"
+              className="img-fluid rounded shadow"
               onError={(e) => {
                 e.target.src = 'https://via.placeholder.com/300x450?text=No+Poster';
               }}
             />
           </Col>
-          {/* Colonna destra con i dettagli del film */}
           <Col md={8}>
-            {/* Sezione trama */}
             <h5 className="text-white mb-3">Trama</h5>
-            <p className="text-muted">{filmDetails.Plot}</p>
+            <p className="text-white">{filmDetails.Plot}</p>
             
-            {/* Sezione dettagli tecnici */}
             <h5 className="text-white mb-3 mt-4">Dettagli</h5>
-            <p className="mb-2"><strong className="text-white">Regista:</strong> <span className="text-muted">{filmDetails.Director}</span></p>
-            <p className="mb-2"><strong className="text-white">Attori:</strong> <span className="text-muted">{filmDetails.Actors}</span></p>
-            <p className="mb-2"><strong className="text-white">Genere:</strong> <span className="text-muted">{filmDetails.Genre}</span></p>
-            <p className="mb-4"><strong className="text-white">Durata:</strong> <span className="text-muted">{filmDetails.Runtime}</span></p>
+            <p className="mb-2"><strong className="text-white">Regista:</strong> <span className="text-white">{filmDetails.Director}</span></p>
+            <p className="mb-2"><strong className="text-white">Attori:</strong> <span className="text-white">{filmDetails.Actors}</span></p>
+            <p className="mb-2"><strong className="text-white">Genere:</strong> <span className="text-white">{filmDetails.Genre}</span></p>
+            <p className="mb-4"><strong className="text-white">Durata:</strong> <span className="text-white">{filmDetails.Runtime}</span></p>
             
-            {/* Sezione valutazioni con badge colorati */}
             <h5 className="text-white mb-3">Valutazioni</h5>
             {filmDetails.Ratings.map((rating, index) => (
               <Badge 
