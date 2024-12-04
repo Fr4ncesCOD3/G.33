@@ -1,5 +1,5 @@
 // Importazione delle dipendenze necessarie
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import FilmCardComponent from './FilmCardComponent';
 import { Row } from 'react-bootstrap';
 
@@ -14,6 +14,13 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
   // State per gestire l'array dei film e lo stato di caricamento
   const [films, setFilms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Aggiungiamo una cache per memorizzare i risultati
+  const cache = useMemo(() => new Map(), []);
+  const cacheKey = `${category}-${contentType}-${searchQuery}-${page}`;
 
   // Effect hook che si attiva quando cambiano category, contentType o searchQuery
   useEffect(() => {
@@ -23,120 +30,79 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
      */
     const fetchFilms = async () => {
       try {
+        // Controlla se i risultati sono già in cache
+        if (cache.has(cacheKey)) {
+          setFilms(cache.get(cacheKey));
+          setLoading(false);
+          return;
+        }
+
         let searchResults = [];
         // Se contentType non è specificato, usa 'movie' come default
         const type = contentType || 'movie';
         
+        // Implementazione della fetch con batch di richieste
+        const fetchBatch = async (query, pageNum) => {
+          try {
+            const type = contentType === 'series' ? 'series' : 'movie';
+            const searchTerm = query || category || type;
+            
+            const response = await fetch(
+              `https://www.omdbapi.com/?apikey=3cccd910&s=${searchTerm}&type=${type}&page=${pageNum}`,
+              {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                },
+                mode: 'cors',
+              }
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.Response === "False") {
+              setHasMore(false);
+              if (pageNum === 1) {
+                setFilms([]);
+              }
+              return [];
+            }
+
+            return data.Search || [];
+          } catch (error) {
+            console.error('Errore nel recupero dei film:', error);
+            setError('Si è verificato un errore nel caricamento dei film.');
+            return [];
+          }
+        };
+
         // Logica per la ricerca per titolo o genere
         if (category === "search" && searchQuery) {
-          setLoading(true);
-          
-          // Prima cerca per titolo
-          const titleResponse = await fetch(
-            `http://www.omdbapi.com/?apikey=3cccd910&s=${searchQuery}&type=${type}`
+          // Batch le richieste di ricerca
+          const batchSize = 5;
+          const searchUrls = Array.from({ length: batchSize }, (_, i) => 
+            `http://www.omdbapi.com/?apikey=3cccd910&s=${searchQuery}&type=${type}&page=${page + i}`
           );
-          const titleData = await titleResponse.json();
-          let titleResults = [];
-          
-          // Se trova risultati, ottiene i dettagli completi per ogni film
-          if (titleData.Response === "True") {
-            const detailedTitleResults = await Promise.all(
-              titleData.Search.map(async (item) => {
-                const detailResponse = await fetch(
-                  `http://www.omdbapi.com/?apikey=3cccd910&i=${item.imdbID}`
-                );
-                return await detailResponse.json();
-              })
-            );
-            titleResults = detailedTitleResults.filter(item => item.Response === "True");
-          }
 
-          // Poi cerca per genere (limitato a 2 pagine per performance)
-          const genrePages = [1, 2];
-          let genreResults = [];
-          
-          for (const page of genrePages) {
-            const response = await fetch(
-              `http://www.omdbapi.com/?apikey=3cccd910&s=${type}&type=${type}&page=${page}`
-            );
-            const data = await response.json();
-            
-            if (data.Response === "True") {
-              // Ottiene dettagli completi per ogni risultato
-              const detailedResults = await Promise.all(
-                data.Search.map(async (item) => {
-                  const detailResponse = await fetch(
-                    `http://www.omdbapi.com/?apikey=3cccd910&i=${item.imdbID}`
-                  );
-                  return await detailResponse.json();
-                })
-              );
-              
-              // Filtra i risultati che hanno il genere cercato
-              const genreMatches = detailedResults.filter(item => 
-                item.Response === "True" && 
-                item.Genre && 
-                item.Genre.toLowerCase().includes(searchQuery.toLowerCase())
-              );
-              
-              genreResults.push(...genreMatches);
-            }
-          }
+          const batchResults = await fetchBatch(searchQuery, page);
+          searchResults = batchResults.flatMap(data => data.Search || []);
 
-          // Combina risultati e rimuove duplicati
-          const allResults = [...titleResults, ...genreResults];
-          searchResults = [...new Map(allResults.map(item => [item.imdbID, item])).values()];
-
-          // Ordina i risultati per rilevanza
-          searchResults.sort((a, b) => {
-            const aTitle = a.Title.toLowerCase();
-            const bTitle = b.Title.toLowerCase();
-            const query = searchQuery.toLowerCase();
-            
-            // Priorità ai titoli che iniziano con la query
-            if (aTitle.startsWith(query) && !bTitle.startsWith(query)) return -1;
-            if (!aTitle.startsWith(query) && bTitle.startsWith(query)) return 1;
-            
-            // Poi ordina per rating
-            return parseFloat(b.imdbRating || 0) - parseFloat(a.imdbRating || 0);
-          });
-
-          // Limita a 20 risultati per performance
-          searchResults = searchResults.slice(0, 20);
-        } 
-        // Logica per categorie specifiche (Action, Comedy, ecc.)
-        else if (['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category)) {
-          // Fetch di 4 pagine per avere più risultati
-          const pages = [1, 2, 3, 4];
-          const allResults = [];
-          
-          for (const page of pages) {
-            const response = await fetch(
-              `http://www.omdbapi.com/?apikey=3cccd910&s=${type}&type=${type}&page=${page}`
-            );
-            const data = await response.json();
-            
-            if (data.Response === "True") {
-              allResults.push(...data.Search);
-            }
-          }
-          
-          // Ottiene dettagli completi e filtra per genere
-          const detailedResults = await Promise.all(
-            allResults.map(async (item) => {
-              const detailResponse = await fetch(
-                `http://www.omdbapi.com/?apikey=3cccd910&i=${item.imdbID}`
-              );
-              return await detailResponse.json();
-            })
+        } else if (['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category)) {
+          // Implementa lazy loading per i generi
+          const response = await fetch(
+            `http://www.omdbapi.com/?apikey=3cccd910&s=${type}&type=${type}&page=${page}`
           );
+          const data = await response.json();
           
-          // Filtra per genere e rimuove duplicati
-          searchResults = detailedResults
-            .filter(item => item.Genre && item.Genre.includes(category))
-            .filter((item, index, self) => 
-              index === self.findIndex((t) => t.imdbID === item.imdbID)
-            );
+          if (data.Response === "True") {
+            searchResults = data.Search;
+            setHasMore(data.totalResults > page * 10);
+          }
         }
         // Logica per nuove uscite
         else if (category === "new-releases") {
@@ -201,7 +167,10 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
           }
         }
         
-        setFilms(searchResults);
+        // Salva i risultati in cache
+        cache.set(cacheKey, searchResults);
+        setFilms(prevFilms => [...prevFilms, ...searchResults]);
+        
       } catch (error) {
         console.error('Errore nel recupero dei film:', error);
       } finally {
@@ -209,14 +178,23 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
       }
     };
 
-    // Implementa un debounce di 300ms per la ricerca
-    const timeoutId = setTimeout(() => {
-      fetchFilms();
-    }, 300);
+    // Implementa debounce più efficiente
+    const debounceTimeout = setTimeout(fetchFilms, 300);
+    return () => clearTimeout(debounceTimeout);
+  }, [category, contentType, searchQuery, page, cacheKey, cache]);
 
-    // Cleanup function per cancellare il timeout
-    return () => clearTimeout(timeoutId);
-  }, [category, contentType, searchQuery]);
+  // Implementa infinite scroll
+  const handleScroll = useCallback((e) => {
+    const { scrollLeft, scrollWidth, clientWidth } = e.target;
+    if (scrollWidth - (scrollLeft + clientWidth) < 200 && !loading && hasMore) {
+      setPage(prev => prev + 1);
+    }
+  }, [loading, hasMore]);
+
+  // Funzione per generare una chiave unica per ogni film
+  const generateUniqueKey = (film, index) => {
+    return `${film.imdbID}-${index}`;
+  };
 
   // Mostra loader durante il caricamento
   if (loading) return <div className="text-white">Caricamento...</div>;
@@ -226,15 +204,17 @@ const AllFilmComponent = ({ category, title, contentType, searchQuery }) => {
     <div className="film-category">
       <h2 className="section-title text-white text-start mb-4">{title}</h2>
       <div className="film-row">
-        <Row className={`${['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category) 
-          ? '' // Layout normale per categorie specifiche
-          : 'flex-nowrap overflow-auto'}`} // Layout scrollabile per altre categorie
+        <Row 
+          className={`${['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'].includes(category) 
+            ? '' : 'flex-nowrap overflow-auto'}`}
+          onScroll={handleScroll}
         >
-          {films.map((film) => (
-            <div key={film.imdbID}>
+          {films.map((film, index) => (
+            <div key={generateUniqueKey(film, index)}>
               <FilmCardComponent film={film} />
             </div>
           ))}
+          {loading && <div className="loading-spinner">Caricamento...</div>}
         </Row>
       </div>
     </div>

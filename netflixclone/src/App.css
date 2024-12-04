@@ -704,3 +704,111 @@ footer a:hover {
     transform: rotate(360deg);
   }
 }
+
+/* Ottimizzazioni per il rendering */
+.film-card {
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* Lazy loading placeholder */
+.film-card-skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Ottimizzazioni per lo scroll */
+.film-row {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.row.flex-nowrap {
+  scroll-snap-type: x mandatory;
+}
+
+.film-card-wrapper {
+  scroll-snap-align: start;
+}
+
+.similar-movies-section {
+  padding: 20px 0;
+}
+
+.similar-movie-card {
+  transition: transform 0.3s ease;
+  background-color: #141414;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.similar-movie-card:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.similar-movie-card img {
+  transition: all 0.3s ease;
+}
+
+.similar-movie-card:hover img {
+  opacity: 0.7;
+}
+
+.movie-info {
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+}
+
+/* Stile per lo scrollbar orizzontale */
+.overflow-auto {
+  scrollbar-width: thin;
+  scrollbar-color: #dc3545 #141414;
+}
+
+.overflow-auto::-webkit-scrollbar {
+  height: 8px;
+}
+
+.overflow-auto::-webkit-scrollbar-track {
+  background: #141414;
+  border-radius: 4px;
+}
+
+.overflow-auto::-webkit-scrollbar-thumb {
+  background-color: #dc3545;
+  border-radius: 4px;
+}
+
+/* Assicura che il contenitore mantenga l'altezza corretta */
+.row.flex-nowrap {
+  margin-right: -15px;
+  margin-left: -15px;
+  padding-bottom: 15px; /* Spazio per lo scrollbar */
+}
+
+/* Stile per il titolo della sezione */
+.similar-movies-section h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-left: 15px;
+}
+
+/* Stile per il testo nelle card */
+.movie-info h5 {
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.movie-info p {
+  font-size: 0.875rem;
+}

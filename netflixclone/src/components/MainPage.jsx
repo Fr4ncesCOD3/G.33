@@ -1,7 +1,7 @@
 // Importazione delle dipendenze necessarie
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AllFilmComponent from './AllFilmComponent'; // Componente per visualizzare le sezioni di film
-import { Container, Dropdown } from 'react-bootstrap'; // Componenti Bootstrap per il layout
+import { Container } from 'react-bootstrap'; // Componenti Bootstrap per il layout
 
 /**
  * Componente principale che rappresenta la pagina principale dell'applicazione
@@ -9,98 +9,86 @@ import { Container, Dropdown } from 'react-bootstrap'; // Componenti Bootstrap p
  * @param {function} setSelectedGenre - Funzione per aggiornare il genere selezionato
  * @param {string} contentType - Tipo di contenuto (film/serie)
  * @param {string} searchQuery - Query di ricerca inserita dall'utente
- * @param {boolean} isKidsMode - Flag per la modalità bambini
  */
-const MainPage = ({ selectedGenre, setSelectedGenre, contentType, searchQuery, isKidsMode }) => {
-  // Array dei generi disponibili per il filtro
-  const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Adventure'];
+const MainPage = ({ selectedGenre, setSelectedGenre, contentType, searchQuery }) => {
+  // Stato per memorizzare i film in cache per ogni tipo di contenuto
+  const [cachedFilms, setCachedFilms] = useState({});
 
-  return (
-    <>
-      {/* Container per il titolo dinamico della pagina */}
-      <div className="dynamic-title-container">
-        <h1 className="main-title text-center">
-          {/* Logica per mostrare il titolo appropriato in base ai parametri */}
-          {searchQuery ? `Risultati per: ${searchQuery}` :
-           isKidsMode ? '🌟 Area Bambini' :
-           contentType === 'series' ? 'Serie TV' : 
-           contentType === 'movie' ? 'Film' : 
-           'TV Shows & Movies'}
-        </h1>
-        <div className="title-background"></div>
-      </div>
+  // Array di categorie per la home page
+  const categories = [
+    { id: 'popular', title: 'Film Popolari', query: 'movie' },
+    { id: 'action', title: 'Film d\'Azione', query: 'action' },
+    { id: 'comedy', title: 'Commedie', query: 'comedy' },
+    { id: 'drama', title: 'Drammatici', query: 'drama' },
+    { id: 'horror', title: 'Horror', query: 'horror' },
+    { id: 'scifi', title: 'Fantascienza', query: 'sci-fi' }
+  ];
 
-      {/* Container principale per il contenuto */}
+  // Effect per recuperare e memorizzare i film in cache
+  // Si attiva quando cambia il tipo di contenuto
+  useEffect(() => {
+    const fetchFilms = async () => {
+      // Verifica se i film sono già in cache per questo tipo di contenuto
+      if (cachedFilms[contentType]) {
+        return;
+      }
+
+      try {
+        // Chiamata API per recuperare i film
+        const response = await fetch(`https://www.omdbapi.com/?apikey=3cccd910&s=${contentType}`);
+        const data = await response.json();
+        if (data.Response === "True") {
+          // Aggiorna la cache con i nuovi film mantenendo quelli esistenti
+          setCachedFilms(prev => ({ ...prev, [contentType]: data.Search }));
+        }
+      } catch (error) {
+        console.error('Errore nel recupero dei film:', error);
+      }
+    };
+
+    fetchFilms();
+  }, [contentType, cachedFilms]);
+
+  // Se c'è una ricerca in corso, mostra solo i risultati della ricerca
+  if (searchQuery) {
+    return (
       <Container fluid className="px-4">
-        {/* Rendering condizionale basato sulla presenza di una query di ricerca */}
-        {searchQuery ? (
-          // Mostra i risultati della ricerca
-          <AllFilmComponent 
-            category="search"
-            title="Risultati della ricerca"
-            contentType={contentType}
-            searchQuery={searchQuery}
-            isKidsMode={isKidsMode}
-          />
-        ) : (
-          <>
-            {/* Dropdown per la selezione del genere (nascosto in modalità bambini) */}
-            {!isKidsMode && (
-              <Dropdown className="genres-dropdown mb-4">
-                <Dropdown.Toggle variant="outline-light" id="dropdown-basic">
-                  Genres
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  {/* Mapping dei generi disponibili */}
-                  {genres.map((genre) => (
-                    <Dropdown.Item key={genre} onClick={() => setSelectedGenre(genre)}>
-                      {genre}
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            )}
-
-            {/* Rendering condizionale basato sul genere selezionato e modalità bambini */}
-            {selectedGenre && !isKidsMode ? (
-              // Mostra film del genere selezionato
-              <AllFilmComponent 
-                category={selectedGenre} 
-                title={`Genre: ${selectedGenre}`} 
-                contentType={contentType}
-                isKidsMode={isKidsMode}
-              />
-            ) : (
-              // Mostra le sezioni predefinite
-              <div className="film-sections">
-                {/* Prima sezione: Cartoni Animati/Nuove Uscite */}
-                <AllFilmComponent 
-                  category="animation"
-                  title={isKidsMode ? "Cartoni Animati" : "Nuove Uscite"}
-                  contentType={contentType}
-                  isKidsMode={isKidsMode}
-                />
-                {/* Seconda sezione: Disney/Top 10 */}
-                <AllFilmComponent 
-                  category="disney"
-                  title={isKidsMode ? "Disney" : "Top 10 Questo Mese"}
-                  contentType={contentType}
-                  isKidsMode={isKidsMode}
-                />
-                {/* Terza sezione: Pixar/In Arrivo */}
-                <AllFilmComponent 
-                  category="pixar"
-                  title={isKidsMode ? "Pixar" : "In Arrivo"}
-                  contentType={contentType}
-                  isKidsMode={isKidsMode}
-                />
-              </div>
-            )}
-          </>
-        )}
+        <AllFilmComponent 
+          category={searchQuery}
+          title={`Risultati per: ${searchQuery}`}
+          contentType={contentType}
+          searchQuery={searchQuery}
+        />
       </Container>
-    </>
+    );
+  }
+
+  // Se è selezionato un genere specifico, mostra solo quel genere
+  if (selectedGenre) {
+    return (
+      <Container fluid className="px-4">
+        <AllFilmComponent 
+          category={selectedGenre}
+          title={`Genere: ${selectedGenre}`}
+          contentType={contentType}
+        />
+      </Container>
+    );
+  }
+
+  // Altrimenti mostra tutte le categorie nella home
+  return (
+    <Container fluid className="px-4">
+      {categories.map(category => (
+        <div key={category.id} className="mb-5">
+          <AllFilmComponent 
+            category={category.query}
+            title={category.title}
+            contentType="movie"
+          />
+        </div>
+      ))}
+    </Container>
   );
 };
 

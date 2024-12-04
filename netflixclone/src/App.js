@@ -7,12 +7,16 @@ import MainPage from './components/MainPage';
 import { useEffect, useState } from 'react';
 import LoaderComponent from './components/LoaderComponent';
 import ProfileSettings from './components/ProfileSettings';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import TVShows from './components/TVShows';
+import MovieDetails from './components/MovieDetails';
 
 /**
  * Componente principale dell'applicazione che gestisce la logica di navigazione
  * e lo stato globale dell'app
  */
 function App() {
+  // STATO DELL'APPLICAZIONE
   // Stato per il genere selezionato dei film/serie
   const [selectedGenre, setSelectedGenre] = useState(null);
   // Stato per il tipo di contenuto (film o serie)
@@ -26,6 +30,7 @@ function App() {
   // Stato per mostrare/nascondere le impostazioni del profilo
   const [showProfile, setShowProfile] = useState(false);
 
+  // EFFETTI COLLATERALI
   useEffect(() => {
     // Gestori eventi per lo stato online/offline
     const handleOnline = () => setIsOnline(true);
@@ -43,10 +48,12 @@ function App() {
     // Funzione per gestire l'effetto di scroll sulla navbar
     const handleScroll = () => {
       const navbar = document.querySelector('.navbar');
-      if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
+      if (navbar) {
+        if (window.scrollY > 100) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
       }
     };
 
@@ -62,6 +69,7 @@ function App() {
     };
   }, []);
 
+  // FUNZIONI DI GESTIONE DELLA NAVIGAZIONE
   /**
    * Resetta l'app alla home page
    */
@@ -95,6 +103,7 @@ function App() {
     setSelectedGenre(null);
   };
 
+  // GESTIONE STATI CONDIZIONALI
   // Mostra il loader durante il caricamento iniziale
   if (isInitialLoading) {
     return <LoaderComponent error={false} />;
@@ -110,26 +119,43 @@ function App() {
     return <ProfileSettings onBack={() => setShowProfile(false)} />;
   }
 
-  // Rendering del layout principale dell'applicazione
+  // RENDERING DELL'APPLICAZIONE
+  // Rendering del layout principale dell'applicazione con React Router
   return (
-    <div className="App">
-      <NavBar 
-        onHomeClick={resetToHome} 
-        onTVSeriesClick={showTVSeries}
-        onMoviesClick={showMovies}
-        onSearch={handleSearch}
-        onProfileClick={() => setShowProfile(true)}
-      />
-      <main className="bg-black" style={{ paddingTop: '5rem' }}>
-        <MainPage 
-          selectedGenre={selectedGenre} 
-          setSelectedGenre={setSelectedGenre}
-          contentType={contentType}
-          searchQuery={searchQuery}
+    <BrowserRouter>
+      <div className="App">
+        {/* Navbar con gestione degli eventi di navigazione */}
+        <NavBar 
+          onHomeClick={resetToHome} 
+          onTVSeriesClick={showTVSeries}
+          onMoviesClick={showMovies}
+          onSearch={handleSearch}
+          onProfileClick={() => setShowProfile(true)}
         />
-      </main>
-      <Footer />
-    </div>
+        {/* Contenuto principale con routing */}
+        <main className="bg-black" style={{ paddingTop: '5rem' }}>
+          <Routes>
+            {/* Route per la home page */}
+            <Route path="/" element={
+              <MainPage 
+                selectedGenre={selectedGenre} 
+                setSelectedGenre={setSelectedGenre}
+                contentType={contentType}
+                searchQuery={searchQuery}
+              />
+            } />
+            {/* Route per le serie TV */}
+            <Route path="/tv-shows" element={<TVShows />} />
+            {/* Route per i dettagli del film */}
+            <Route path="/movie-details/:movieId" element={<MovieDetails />} />
+            {/* Route per le impostazioni del profilo */}
+            <Route path="/profile-settings" element={<ProfileSettings onBack={() => setShowProfile(false)} />} />
+          </Routes>
+        </main>
+        {/* Footer dell'applicazione */}
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
